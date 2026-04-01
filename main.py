@@ -1,5 +1,3 @@
-# main.py
-
 print("\n===== STARTING FULL PIPELINE =====\n")
 
 print("1. Running Feature Engineering...")
@@ -14,13 +12,18 @@ import src.models.mfufs
 print("4. Creating Labels...")
 import src.evaluation.create_labels
 
+from src.models.logistic_model import run_logistic
+from src.models.svm_model import run_svm
+from src.models.knn_model import run_knn
+
+
 print("5. Running Logistic Regression...")
-import src.models.logistic_model
+run_logistic()
 
 print("6. Running SVM...")
-import src.models.svm_model
+run_svm()
 
 print("7. Running KNN...")
-import src.models.knn_model
+run_knn()
 
 print("\n===== PIPELINE COMPLETED SUCCESSFULLY =====\n")
