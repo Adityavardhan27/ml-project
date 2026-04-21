@@ -6,55 +6,76 @@ def run_knn():
     from sklearn.metrics import classification_report, confusion_matrix
     from sklearn.preprocessing import StandardScaler
     from imblearn.over_sampling import SMOTE
+
     print("\n===== KNN =====")
 
-    #  Load data
+    # -----------------------------
+    # Load Data
+    # -----------------------------
     df = pd.read_csv("Data/labeled_data.csv")
-    df["value_ratio"] = df["Net Value"] / (df["Total Value"] + 1)
-    df["fee_to_value"] = df["TxnFee(ETH)"] / (df["Total Value"] + 1)
-    df["is_high_fee"] = (df["Fee Ratio"] > df["Fee Ratio"].mean()).astype(int)
 
+    # -----------------------------
+    # Feature Engineering (NEW DATA)
+    # -----------------------------
+    df["value_ratio"] = df["Value"] / (df["GasCost"] + 1)
+    df["gas_efficiency"] = df["GasEfficiency"]
+    df["is_high_value"] = (df["Value"] > df["Value"].mean()).astype(int)
+
+    # -----------------------------
+    # Features
+    # -----------------------------
     features = [
-        "Total Value_z",
-        "Net Value_z",
-        "Fee Ratio_z",
-        "Time Gap_z",
-        "Block Gap_z",
+        "Value_z",
+        "GasCost_z",
+        "GasEfficiency_z",
+        "TimeGap_z",
+        "BlockGap_z",
         "value_ratio",
-        "fee_to_value",
-        "is_high_fee"
+        "gas_efficiency",
+        "is_high_value"
     ]
 
     X = df[features].fillna(0)
     y = df["label"]
-    X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42,stratify=y
-    )
-    
-    scaler = StandardScaler()
 
+    # -----------------------------
+    # Train-Test Split
+    # -----------------------------
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+
+    # -----------------------------
+    # Handle Imbalance (SMOTE FIRST)
+    # -----------------------------
+    smote = SMOTE(random_state=42)
+    X_train, y_train = smote.fit_resample(X_train, y_train)
+
+    # -----------------------------
+    # Scaling (IMPORTANT FOR KNN)
+    # -----------------------------
+    scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    #  Train-test split (with stratification)
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y,
-        test_size=0.2,
-        random_state=42,
-        stratify=y
-    )
-    
-    smote = SMOTE(random_state=42)
-    X_train, y_train = smote.fit_resample(X_train, y_train)
-    #  Model
-    model = KNeighborsClassifier(n_neighbors=3, weights='distance') 
+    # -----------------------------
+    # Model
+    # -----------------------------
+    model = KNeighborsClassifier(n_neighbors=5, weights='distance')
     model.fit(X_train, y_train)
 
+    # -----------------------------
     # Predictions
+    # -----------------------------
     preds = model.predict(X_test)
 
+    # -----------------------------
     # Evaluation
+    # -----------------------------
+    print("\nConfusion Matrix:")
     print(confusion_matrix(y_test, preds))
+
+    print("\nClassification Report:")
     print(classification_report(y_test, preds))
 
 

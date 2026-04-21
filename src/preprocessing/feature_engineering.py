@@ -1,29 +1,37 @@
 import pandas as pd
 import numpy as np
 
-df= pd.read_csv(r"Data\ethereum.csv")
+df = pd.read_csv("Data/Dataset.csv")
+df.columns = df.columns.str.strip()
 
-# create new behavorial features
+# -----------------------------
+# FEATURE ENGINEERING
+# -----------------------------
 
-df ["Total Value"]= df["Value_IN(ETH)"]+ df["Value_OUT(ETH)"]
-df ["Net Value"]= df["Value_IN(ETH)"]- df["Value_OUT(ETH)"]
+df["Value"] = df["value"]
 
-epsilon = 1e-9            # we took this so that we caan prevent the division from 0
+df["GasCost"] = df["gas"] * df["gas_price"]
 
-df["Fee Ratio"] = df["TxnFee(ETH)"] / (df["Total Value"] + epsilon)
+epsilon = 1e-9
+df["GasEfficiency"] = df["receipt_gas_used"] / (df["gas"] + epsilon)
 
-df= df.sort_values("UnixTimestamp")
-df["Time Gap"]=df["UnixTimestamp"].diff().fillna(0)
-df["Block Gap"]=df["Blockno"].diff().fillna(0)
+# Sort by time
+df["block_timestamp"] = pd.to_datetime(df["block_timestamp"], errors="coerce")
+df = df.sort_values("block_timestamp")
 
-# now we wil standardise z-score
+df["TimeGap"] = df["block_timestamp"].diff().dt.total_seconds().fillna(0)
+df["block_number"] = pd.to_numeric(df["block_number"])
+df["BlockGap"] = df["block_number"].diff().fillna(0)
 
-features = ["Total Value","Net Value","Fee Ratio","Time Gap","Block Gap"]
-for i in features:
-    mean=df[i].mean()
-    std=df[i].std()
-    df[i+"_z"] = (df[i]-mean)/(epsilon+std)
+# -----------------------------
+# Z-SCORE NORMALIZATION
+# -----------------------------
 
-print("z-score applied")
-df.to_csv("Data/processed_ethereum.csv",index= False)
-print("New file saved ")
+features = ["Value", "GasCost", "GasEfficiency", "TimeGap", "BlockGap"]
+
+for col in features:
+    df[col + "_z"] = (df[col] - df[col].mean()) / (df[col].std() + epsilon)
+
+df.to_csv("Data/processed_data.csv", index=False)
+
+print(" Preprocessing complete")
