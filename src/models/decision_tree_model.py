@@ -23,8 +23,28 @@ def run_decision_tree():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
+    # Model instantiation
+    dt = DecisionTreeClassifier(
+        class_weight="balanced",
+        random_state=42,
+        max_depth=10,
+        min_samples_split=10,
+        min_samples_leaf=5
+    )
     
-    # TODO: Add model training and evaluation
-
-if _name_ == "_main_":
+    # Train
+    dt.fit(X_train, y_train)
+    
+    # Evaluate
+    y_pred = dt.predict(X_test)
+    print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+    print("\nClassification Report:\n", classification_report(y_test, y_pred))
+    print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+    # Save model
+    os.makedirs("Models", exist_ok=True)
+    joblib.dump(dt, "Models/decision_tree.pkl")
+    print("Decision Tree model saved to Models/decision_tree.pkl")
+    
+    return dt
+if _name_ == "__main__":
     run_decision_tree()
