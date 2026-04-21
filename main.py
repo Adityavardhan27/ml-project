@@ -15,6 +15,7 @@ import src.evaluation.create_labels
 from src.models.logistic_model import run_logistic
 from src.models.svm_model import run_svm
 from src.models.knn_model import run_knn
+from src.models.decision_tree_model import run_decision_tree
 
 
 print("5. Running Logistic Regression...")
@@ -25,5 +26,8 @@ run_svm()
 
 print("7. Running KNN...")
 run_knn()
+
+print("8. Running Decision Tree...")
+run_decision_tree()
 
 print("\n===== PIPELINE COMPLETED SUCCESSFULLY =====\n")
