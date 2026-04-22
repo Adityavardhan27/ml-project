@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv("Data/Dataset.csv")
+df = pd.read_csv("Data/new dataset/Dataset.csv")
 df.columns = df.columns.str.strip()
 
 # -----------------------------
@@ -41,9 +41,8 @@ final_df = df[[
     "GasEfficiency_z",
     "TimeGap_z",
     "BlockGap_z",
-    "label"
 ]]
 
-final_df.to_csv("Data/processed_data.csv", index=False)
+final_df.to_csv("Data/new dataset/processed_data.csv", index=False)
 
 print(" Clean preprocessing complete")

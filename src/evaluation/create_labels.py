@@ -1,18 +1,12 @@
 import pandas as pd
 
-df = pd.read_csv("Data/final_output.csv", low_memory=False)
+df = pd.read_csv("Data/new dataset/final_output.csv", low_memory=False)
 
-# Assign supervised label from MF-UFS FraudFlag
+# Create label
 df["label"] = df["FraudFlag"]
 
-# Keep only columns needed for model training
-# Drops raw blockchain fields (hash, addresses, input data etc.)
+# Keep only useful columns (NO leakage)
 keep_cols = [
-    "Value",
-    "GasCost",
-    "GasEfficiency",
-    "TimeGap",
-    "BlockGap",
     "Value_z",
     "GasCost_z",
     "GasEfficiency_z",
@@ -22,13 +16,12 @@ keep_cols = [
     "StatScore",
     "TempScore",
     "FinalScore",
-    "FraudFlag",
     "label",
 ]
 
 df = df[keep_cols]
 
-df.to_csv("Data/labeled_data.csv", index=False)
+df.to_csv("Data/new dataset/labeled_data.csv", index=False)
 
 print(" Labels created from MF-UFS")
 print(f" Total rows    : {len(df)}")
