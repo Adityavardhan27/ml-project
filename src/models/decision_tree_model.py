@@ -3,7 +3,6 @@ def run_decision_tree():
     import joblib
     import pandas as pd
     import matplotlib
-    matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     from sklearn.tree import DecisionTreeClassifier, plot_tree
